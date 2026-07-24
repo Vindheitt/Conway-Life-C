@@ -28,6 +28,8 @@
 #define DEFAULT_WAIT 100
 #define SAVE_WAIT 2000
 
+#define ENTER 10
+
 //#define swap(t, x, y) do{t temp = x; x = y; y = temp;} while(0)
 #define swap(t, x, y) {t temp = x; x = y; y = temp;}
 

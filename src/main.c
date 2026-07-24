@@ -1,8 +1,8 @@
 #include "all_src_files.h"
 
 int main(void){
-    int userChoose;
     options_t *config = makeOptions();
+    area_t *area = NULL;
 
     initscr();
     raw();
@@ -10,19 +10,11 @@ int main(void){
     keypad(stdscr, TRUE);
     curs_set(0);
 
-    printw("Hello there!\n");
-    do{
-        do{
-            printActions();
-            printw("Enter your choose: ");
-            refresh();
-        }while(enterInt(&userChoose));
+    action(area, config);
 
-        action(userChoose, config);
-    }while(userChoose);
-
+    destroyData(&area);
     free(config);
+
     endwin();
-    printf("See you soon!\n");
     return 0;
 }

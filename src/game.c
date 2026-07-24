@@ -6,7 +6,6 @@ int startGame(area_t *area, options_t* config){
 
     if(!moveAndChange(area))
         startSimulation(area, config);
-    destroyData(&area);
     return 0;
 }
 int startSimulation(area_t *area,options_t* config) {

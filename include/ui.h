@@ -7,13 +7,13 @@ int actionOptions(options_t*, int);
 
 int chooseSize(options_t*);
 
-int action(int, options_t*);
+int action(area_t*, options_t*);
 
 void printOptions(options_t*);
 
 void defaultChoose(void);
 
-void printActions(void);
+void printActions(int);
 
 int printArea(const area_t*, int, int);
 
