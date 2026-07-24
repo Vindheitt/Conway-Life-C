@@ -26,4 +26,3 @@ int main(void){
     printf("See you soon!\n");
     return 0;
 }
-
