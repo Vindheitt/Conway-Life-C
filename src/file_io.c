@@ -1,6 +1,6 @@
 #include "all_src_files.h"
 
-int readLifeArea(area_t *area, options_t* config){
+int readLifeArea(area_t **area, options_t* config){
     char filename[256];
     size_t rows, cols;
     size_t y, x;
@@ -61,7 +61,7 @@ int readLifeArea(area_t *area, options_t* config){
 
     fclose(file);
     refresh();
-    area = newArea;
+    *area = newArea;
     //startGame(newArea, config);
     return 0;
 }

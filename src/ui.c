@@ -1,3 +1,5 @@
+#include "all_src_files.h"
+
 void printOptions(options_t* config) {
     printw("\t1 - Change rules (now Outside %s)\n", (config->rule) ? "dead" : "toroidal");
     printw("\t2 - Change wait time (now %d)\n", config->waitTime);

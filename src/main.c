@@ -1,8 +1,4 @@
-#include "life_system.h"
-#include "area.h"
-#include "options.h"
-#include "io_life.h"
-#include "game.h"
+#include "all_src_files.h"
 
 int action(int, options_t*);
 
@@ -45,7 +41,7 @@ int action(int userChoose, options_t* config){
             changeOptions(config);
             break;
         case 3:
-            readLifeArea(area, config);
+            readLifeArea(&area, config);
             break;
         case 0:
 

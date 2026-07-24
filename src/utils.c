@@ -1,3 +1,5 @@
+#include "all_src_files.h"
+
 int enterInt(int *n) {
     char buf[32];
 
