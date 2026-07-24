@@ -1,6 +1,6 @@
 #include "all_src_files.h"
 
-int readLifeArea(options_t* config){
+int readLifeArea(area_t *area, options_t* config){
     char filename[256];
     size_t rows, cols;
     size_t y, x;
@@ -61,7 +61,8 @@ int readLifeArea(options_t* config){
 
     fclose(file);
     refresh();
-    startGame(newArea, config);
+    area = newArea;
+    //startGame(newArea, config);
     return 0;
 }
 int saveLifeArea(const area_t *area) {
@@ -115,95 +116,5 @@ int saveLifeArea(const area_t *area) {
     noecho();
     curs_set(0);
     waitMs(SAVE_WAIT);
-    return 0;
-}
-int enterInt(int *n) {
-    char buf[32];
-
-    if (!n)
-        return -1;
-
-    echo();
-    curs_set(1);
-    while (TRUE) {
-        getnstr(buf, sizeof(buf)-1);
-        if (sscanf(buf, "%d", n) == 1)
-            break;
-        clear();
-        printw("Something went wrong with enter int..\n");
-        refresh();
-        clrtoeol();
-        refresh();
-        noecho();
-        curs_set(0);
-        return 1;
-    }
-    curs_set(0);
-    noecho();
-    return 0;
-}
-int enterSize(size_t *n) {
-    char buf[32];
-
-    if (!n)
-        return -1;
-
-    echo();
-    curs_set(1);
-    while (TRUE) {
-        getnstr(buf, sizeof(buf)-1);
-        if (sscanf(buf, "%zu", n) == 1)
-            break;
-        clear();
-        printw("Something went wrong with enter int..\n");
-        refresh();
-        clrtoeol();
-        refresh();
-        noecho();
-        curs_set(0);
-        return 1;
-    }
-    curs_set(0);
-    noecho();
-    return 0;
-}
-void printOptions(options_t* config) {
-    printw("\t1 - Change rules (now Outside %s)\n", (config->rule) ? "dead" : "toroidal");
-    printw("\t2 - Change wait time (now %d)\n", config->waitTime);
-    printw("\t3 - Change size (now %zux%zu)\n", config->rows,config->cols);
-    printw("\t0 - Return\n");
-}
-void printActions(void) {
-    printw("\t1 - Start\n");
-    printw("\t2 - Options\n");
-    printw("\t3 - Read from file\n");
-    printw("\t0 - Exit\n");
-}
-void defaultChoose(void) {
-    clear();
-    printw("Something went wrong with choose...\n");
-    refresh();
-}
-int printArea(const area_t *area, int curY, int curX) {
-    int x, y;
-    size_t rows;
-    size_t cols;
-
-    if (!area)
-        return -1;
-
-    rows = area->rows;
-    cols = area->cols;
-    clear();
-    for (y = 0; y < (int)rows; y++) {
-        for (x = 0; x < (int)cols; x++) {
-            if (curY >= 0 && y == curY && x == curX)
-                attron(A_REVERSE | A_BOLD);
-            mvprintw(y, x * 2, "%c ", getCell(area,y,x) ? '@' : '*');
-            if (curY >= 0 && y == curY && x == curX)
-                attroff(A_REVERSE | A_BOLD);
-        }
-    }
-    refresh();
     return 0;
 }

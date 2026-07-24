@@ -34,17 +34,18 @@ int main(void){
 }
 int action(int userChoose, options_t* config){
     clear();
+    area_t *area = NULL;
     if(!config)
         return -1;
     switch (userChoose) {
         case 1:
-            startGame(NULL,config);
+            startGame(area,config);
             break;
         case 2:
             changeOptions(config);
             break;
         case 3:
-            readLifeArea(config);
+            readLifeArea(area, config);
             break;
         case 0:
 

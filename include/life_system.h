@@ -1,3 +1,6 @@
+#ifndef LIFE_SYSTEM_H
+#define LIFE_SYSTEM_H
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -43,3 +46,5 @@ typedef struct Options{
     size_t cols;
     size_t rows;
 }options_t;
+
+#endif

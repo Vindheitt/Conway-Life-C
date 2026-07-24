@@ -101,12 +101,3 @@ options_t* makeOptions(){
     config->rows = DEFAULT_HEIGHT;
     return config;
 }
-int waitMs(int ms) {
-    if (ms <= 0) return -1;
-    #ifdef WIN32
-    Sleep(ms);
-    #else
-    usleep(ms * 1000);
-    #endif
-    return 0;
-}
