@@ -1,6 +1,6 @@
 #include "all_src_files.h"
 
-int readLifeArea(area_t **area, options_t* config){
+status_t readLifeArea(area_t **area, options_t* config){
     char filename[256];
     size_t rows, cols;
     size_t y, x;
@@ -21,7 +21,7 @@ int readLifeArea(area_t **area, options_t* config){
         refresh();
         noecho();
         curs_set(0);
-        return -1;
+        return STATUS_ERR_FILE_OPEN;
     }
 
     if (fscanf(file, "%zu %zu", &rows, &cols) != 2) {
@@ -30,7 +30,7 @@ int readLifeArea(area_t **area, options_t* config){
         noecho();
         curs_set(0);
         fclose(file);
-        return -1;
+        return STATUS_ERR_FILE_FORMAT;
     }
 
     config->rows = rows;
@@ -41,7 +41,7 @@ int readLifeArea(area_t **area, options_t* config){
         noecho();
         curs_set(0);
         fclose(file);
-        return -1;
+        return STATUS_ERR_NULL_PTR;
     }
 
     x = 0;
@@ -62,10 +62,10 @@ int readLifeArea(area_t **area, options_t* config){
     fclose(file);
     refresh();
     *area = newArea;
-    //startGame(newArea, config);
-    return 0;
+
+    return STATUS_OK;
 }
-int saveLifeArea(const area_t *area) {
+status_t saveLifeArea(const area_t *area) {
     char filename[256];
     size_t y,x;
     size_t rows;
@@ -75,7 +75,7 @@ int saveLifeArea(const area_t *area) {
     if (!area) {
         mvprintw(LINES-2, 0, "Err. Area is NULL.\n");
         refresh();
-        return -1;
+        return STATUS_ERR_NULL_PTR;
     }
     rows = area->rows;
     cols = area->cols;
@@ -98,7 +98,7 @@ int saveLifeArea(const area_t *area) {
     if (!file) {
         printw("Error opening file '%s' for writing..\n", filename);
         refresh();
-        return -1;
+        return STATUS_ERR_FILE_OPEN;
     }
 
     fprintf(file, "%zu %zu\n", rows, cols);
@@ -116,5 +116,5 @@ int saveLifeArea(const area_t *area) {
     noecho();
     curs_set(0);
     waitMs(SAVE_WAIT);
-    return 0;
+    return STATUS_OK;
 }

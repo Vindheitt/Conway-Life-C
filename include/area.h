@@ -1,8 +1,6 @@
 #ifndef AREA_H
 #define AREA_H
 
-int moveAndChange(area_t*);
-
 void destroyData(area_t**);
 
 void endOfProgramm(void);
