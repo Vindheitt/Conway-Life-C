@@ -90,6 +90,26 @@ status_t printArea(const area_t *area, int curY, int curX) {
     refresh();
     return STATUS_OK;
 }
+status_t printSimulatuon(const area_t* area, int alive, int generation, int paused){
+    size_t rows;
+    size_t cols;
+
+    rows = area->rows;
+    cols = area->cols;
+
+    if(!paused){
+    printArea(area, -1, -1);
+    mvprintw(rows + 1, 0,
+             "Generation: %d   Alive: %d   (q - quit, p - pause)",
+             generation, alive);
+    refresh();
+    }
+    else{
+        mvprintw(LINES-2, 0, ">>> pause (p - continue, s - save) <<<");
+        refresh();
+    }
+    return STATUS_OK;
+}
 status_t moveAndChange(area_t *area) {
     int curY = 0, curX = 0;
     int ch = 0;

@@ -9,6 +9,8 @@ status_t printArea(const area_t*, int, int);
 
 status_t moveAndChange(area_t*);
 
+status_t printSimulatuon(const area_t*, int, int, int);
+
 int changeOptions(options_t*);
 
 int actionOptions(options_t*, int);
