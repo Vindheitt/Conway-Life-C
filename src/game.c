@@ -5,13 +5,16 @@
 #include "ui.h"
 #include "utils.h"
 
-status_t startGame(area_t* area, options_t* config){
-    if(!area)
-        createArea(&area, config->rows, config->cols);
+status_t startGame(area_t** area, options_t* config){
     if(!area)
         return STATUS_ERR_NULL_PTR;
+    if(!(*area))
+        createArea(area, config->rows, config->cols);
+    if(!(*area))
+        return STATUS_ERR_NULL_PTR;
+
     if(moveAndChange(area) == STATUS_OK)
-        startSimulation(area, config);
+        startSimulation(*area, config);
     return STATUS_OK;
 }
 status_t startSimulation(area_t* area, options_t* config) {
@@ -48,7 +51,7 @@ status_t startSimulation(area_t* area, options_t* config) {
             generation++;
             countOfAlive(area, &alive);
         }
-        printSimulatuon(area, alive, generation, paused);
+        printSimulation(area, alive, generation, paused);
         waitMs(config->waitTime);
     }
     nodelay(stdscr, FALSE);

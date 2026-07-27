@@ -1,7 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-status_t startGame(area_t*,options_t*);
+status_t startGame(area_t**,options_t*);
 
 status_t startSimulation(area_t*,options_t*);
 

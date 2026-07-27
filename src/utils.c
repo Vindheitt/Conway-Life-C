@@ -2,9 +2,8 @@
 #include "utils.h"
 
 status_t enterInt(int *n) {
-    char buf[32];
+    char buf[BUFFER_SIZE];
     int result;
-
     if (!n)
         return STATUS_ERR_NULL_PTR;
 
@@ -23,7 +22,7 @@ status_t enterInt(int *n) {
     return STATUS_OK;
 }
 status_t enterSize(size_t *n) {
-    char buf[32];
+    char buf[BUFFER_SIZE];
     int result;
 
     if (!n)
@@ -46,10 +45,6 @@ status_t enterSize(size_t *n) {
 status_t waitMs(size_t ms) {
     if (ms <= 0)
         ms = DEFAULT_WAIT;
-    // #ifdef WIN32
-    //     Sleep(ms);
-    // #else
-        usleep(ms * 1000);
-    //#endif
+    usleep(ms * 1000);
     return STATUS_OK;
 }

@@ -15,7 +15,7 @@ int main(void){
     curs_set(0);
 
     makeOptions(&config);
-    while(mainMenu(area, config) != STATUS_EXIT);
+    while(mainMenu(&area, config) != STATUS_EXIT);
 
     destroyArea(&area);
     free(config);
@@ -28,21 +28,10 @@ status_t makeOptions(options_t** config){
     (*config) = malloc(sizeof(options_t));
     if (!(*config))
         return STATUS_ERR_MEMORY;
-    (*config)->rule = OUTSIDE_LOCKED;
+    (*config)->rule = OUTSIDE_DEAD;
     (*config)->waitTime = DEFAULT_WAIT;
 
     (*config)->cols = DEFAULT_WIDTH;
     (*config)->rows = DEFAULT_HEIGHT;
     return STATUS_OK;
 }
-// options_t* makeOptions(){
-//     options_t* config = malloc(sizeof(options_t));
-//     if (!config)
-//         return NULL;
-//     config->rule = OUTSIDE_LOCKED;
-//     config->waitTime = DEFAULT_WAIT;
-//
-//     config->cols = DEFAULT_WIDTH;
-//     config->rows = DEFAULT_HEIGHT;
-//     return config;
-// }

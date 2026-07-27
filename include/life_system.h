@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <limits.h>
 
 #include <ncurses.h>
 #include <unistd.h>
@@ -20,6 +21,8 @@
 #define DEFAULT_WAIT 100
 #define SAVE_WAIT 2000
 
+#define BUFFER_SIZE 32
+
 #define ENTER 10
 
 #define swap(t, x, y) do{t temp = x; x = y; y = temp;} while(0)
@@ -31,7 +34,8 @@ typedef enum{
     STATUS_ERR_MEMORY,
     STATUS_ERR_FILE_OPEN,
     STATUS_ERR_FILE_FORMAT,
-    STATUS_ERR_INVALID_INPUT
+    STATUS_ERR_INVALID_INPUT,
+    STATUS_ERR_EMPTY_STR
 }status_t;
 
 typedef struct Area{
@@ -44,8 +48,8 @@ typedef struct Area{
 typedef struct Options{
     int rule;
     //int neighbors;
+    //int waitTime;
     size_t waitTime;
-
     size_t cols;
     size_t rows;
 }options_t;

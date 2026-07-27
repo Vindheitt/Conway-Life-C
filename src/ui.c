@@ -38,7 +38,7 @@ status_t menuDrawUI(char* title, char* menuItems[], int menuCount, int *userChoo
     }
     return STATUS_OK;
 }
-status_t mainMenu(area_t *area, options_t* config){
+status_t mainMenu(area_t** area, options_t* config){
     char* title = "Conway's game Life\n";
     char* menuItems[] = {
         "Start\n",
@@ -66,7 +66,7 @@ status_t mainMenu(area_t *area, options_t* config){
             optionsMenu(config);
             break;
         case 2:
-            if(readLifeAreaUI(&area, config) == STATUS_OK)
+            if(readLifeAreaUI(area, config) == STATUS_OK)
                 startGame(area, config);
             break;
         case 3:
@@ -97,7 +97,7 @@ status_t printArea(const area_t *area, int curY, int curX) {
     refresh();
     return STATUS_OK;
 }
-status_t printSimulatuon(const area_t* area, int alive, int generation, int paused){
+status_t printSimulation(const area_t* area, int alive, int generation, int paused){
     size_t rows;
 
     if(!area)
@@ -118,22 +118,20 @@ status_t printSimulatuon(const area_t* area, int alive, int generation, int paus
     }
     return STATUS_OK;
 }
-status_t moveAndChange(area_t *area) {
+status_t moveAndChange(area_t** area) {
     int curY = 0, curX = 0;
     int ch = 0;
     size_t rows;
     size_t cols;
 
-    if (!area){
-        //system("echo error_moveAndChange_null_ptr > logs.txt");
+    if (!area || !(*area))
         return STATUS_ERR_NULL_PTR;
-    }
 
-    rows = area->rows;
-    cols = area->cols;
+    rows = (*area)->rows;
+    cols = (*area)->cols;
 
     while (ch != ENTER) {
-        printArea(area, curY, curX);
+        printArea((*area), curY, curX);
         mvprintw(rows + 1, 0,
                  "Coord: y=%d x=%d (h,j,k,l - move, e - change, Enter - start, s - save; q - quit)",
                  curY + 1, curX + 1);
@@ -155,10 +153,10 @@ status_t moveAndChange(area_t *area) {
                 curX = (curX < (int)cols - 1) ? (curX + 1) : 0;
                 break;
             case 'e':
-                setCell(area, curY, curX, !getCell(area, curY, curX));
+                setCell((*area), curY, curX, !getCell((*area), curY, curX));
                 break;
             case 's':
-                saveLifeAreaUI(area);
+                saveLifeAreaUI((*area));
                 break;
             case 'q':
                 clear();
@@ -254,25 +252,23 @@ status_t optionsMenu(options_t* config){
         "Return"
     };
 
-    menuCount = sizeof(menuItems) / sizeof(menuItems[0]);
-
     if(!config)
         return STATUS_ERR_NULL_PTR;
+
+    menuCount = sizeof(menuItems) / sizeof(menuItems[0]);
 
     do{
         snprintf(ruleInfo, sizeof(ruleInfo), "Change rules (now Outside %s)\n", config->rule == OUTSIDE_DEAD ? "dead" : "toroidal");
         snprintf(waitInfo, sizeof(waitInfo), "Change wait time (now %zu ms)\n", config->waitTime);
         snprintf(sizeInfo, sizeof(sizeInfo), "Change size (now %zux%zu)\n", config->rows, config->cols);
 
+        clear();
         menuDrawUI(title, menuItems, menuCount, &userChoose);
     }while(changeOptions(config, userChoose) != STATUS_EXIT);
 
-    clear();
     return STATUS_OK;
 }
-//-----------------------------------------------------
 status_t changeOptions(options_t* config, int userChoose){
-    int newValue;
     if(!config)
         return STATUS_ERR_NULL_PTR;
     switch (userChoose) {
@@ -280,14 +276,10 @@ status_t changeOptions(options_t* config, int userChoose){
             changeRulesUI(config);
             break;
         case 1:
-            do{
-                clear();
-                printw("Enter new value (ms, >=100): ");
-            }while(enterInt(&newValue) || (newValue < 100));
-            config->waitTime = newValue;
+            changeWaitTimeUI(config);
             break;
         case 2:
-            chooseSize(config);
+            changeSizeUI(config);
             break;
         case 3:
             return STATUS_EXIT;
@@ -317,35 +309,65 @@ status_t changeRulesUI(options_t* config){
 
     return STATUS_OK;
 }
-status_t chooseSize(options_t* config){
+status_t changeWaitTimeUI(options_t* config){
+    size_t waitTime;
+
+    clear();
+    while(TRUE){
+        do{
+            printw("Enter new wait-time (ms, >= 10): ");
+            refresh();
+        }while(enterSize(&waitTime));
+        clear();
+        if(waitTime < 10)
+            printw("Incorrect value. Please try again.\n");
+        else
+            break;
+    }
+    clear();
+
+    config->waitTime = waitTime;
+    return STATUS_OK;
+}
+status_t changeSizeUI(options_t* config){
     size_t rows = 0;
     size_t cols = 0;
+
+    int result;
 
     if(!config)
         return STATUS_ERR_NULL_PTR;
 
     clear();
-    while(rows < 1 || (int)rows > LINES - 2){
-        do{
-            printw("Please enter quantity of rows (1..%d): ", LINES - 2);
-            refresh();
-        }while(enterSize(&rows));
-        if(rows < 1 || (int)rows > LINES - 2){
-            clear();
-            printw("Incorrect value. Please try again.\n");
+
+    while(TRUE){
+        printw("Please enter quantity of rows (1..%d): ", LINES - 2);
+        refresh();
+        result = enterSize(&rows);
+        clear();
+
+        if(result == STATUS_ERR_INVALID_INPUT){
+            printw("Something went wrong with enter number...\n");
         }
+        else if(rows < 1 || (int)rows > LINES - 2)
+            printw("Incorrect value. Please try again.\n");
+        else
+            break;
     }
     clear();
-    while(cols < 1 || (int)cols > (COLS/2) - 1){
+    while(TRUE){
+        printw("Please enter quantity of columns (1..%d): ", (COLS/2) - 1);
+        refresh();
+        result = enterSize(&cols);
+        clear();
 
-        do{
-            printw("Please enter quantity of columns (1..%d): ", (COLS/2) - 1);
-            refresh();
-        }while(enterSize(&cols));
-        if(cols < 1 || (int)cols > (COLS/2) - 1){
-            clear();
-            printw("Incorrect value. Please try again.\n");
+        if(result == STATUS_ERR_INVALID_INPUT){
+            printw("Something went wrong with enter number...\n");
         }
+        else if(cols < 1 || (int)cols > (COLS/2) - 1)
+            printw("Incorrect value. Please try again.\n");
+        else
+            break;
     }
     config->rows = rows;
     config->cols = cols;
