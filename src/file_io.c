@@ -7,6 +7,8 @@ status_t readLifeArea(area_t **area, options_t* config){
     int c;
     FILE *file;
 
+    area_t* newArea = NULL;
+
     clear();
     printw("Enter filename to read: ");
     refresh();
@@ -36,7 +38,7 @@ status_t readLifeArea(area_t **area, options_t* config){
     config->rows = rows;
     config->cols = cols;
 
-    area_t* newArea = createArea(rows, cols);
+    createArea(&newArea, rows, cols);
     if (!newArea) {
         noecho();
         curs_set(0);

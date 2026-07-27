@@ -10,9 +10,9 @@ int main(void){
     keypad(stdscr, TRUE);
     curs_set(0);
 
-    action(area, config);
+    while(mainMenu(area, config) != STATUS_EXIT);
 
-    destroyData(&area);
+    destroyArea(&area);
     free(config);
 
     endwin();

@@ -35,12 +35,23 @@
 
 typedef enum{
     STATUS_OK = 0,
+    STATUS_EXIT,
     STATUS_ERR_NULL_PTR,
     STATUS_ERR_MEMORY,
     STATUS_ERR_FILE_OPEN,
     STATUS_ERR_FILE_FORMAT,
     STATUS_ERR_INVALID_INPUT
 }status_t;
+/*
+typedef enum{
+    OK = 0,
+    EXIT,
+    ERR_NULL_PTR,
+    ERR_MEMORY,
+    ERR_FILE_OPEN,
+    ERR_FILE_FORMAT,
+    ERR_INVALID_INPUT
+}status_t;*/
 
 typedef struct Area{
     size_t cols;

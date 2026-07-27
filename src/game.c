@@ -1,21 +1,24 @@
 #include "all_src_files.h"
 
-int startGame(area_t *area, options_t* config){
+int startGame(area_t* area, options_t* config){
     if(!area)
-        area = createArea(config->rows, config->cols);
-
-    if(!moveAndChange(area))
+        createArea(&area, config->rows, config->cols);
+    if(!area)
+        return -1;
+    if(moveAndChange(area) == STATUS_OK)
         startSimulation(area, config);
     return 0;
 }
-int startSimulation(area_t *area,options_t* config) {
+int startSimulation(area_t* area, options_t* config) {
     int paused = 0;
     int generation = 0;
-    int alive = 0;
+    int alive;
     int ch;
 
     size_t rows;
     size_t cols;
+
+    area_t *tempArea;
 
     if (!area)
         return -1;
@@ -23,7 +26,8 @@ int startSimulation(area_t *area,options_t* config) {
     rows = area->rows;
     cols = area->cols;
 
-    area_t *tempArea = createArea(rows, cols);
+    createArea(&tempArea, rows, cols);
+
     if (!tempArea)
         return -1;
 
@@ -38,7 +42,7 @@ int startSimulation(area_t *area,options_t* config) {
         if (!paused) {
             nextGeneration(tempArea, area, config);
             generation++;
-            alive = countOfAlive(area);
+            countOfAlive(area, &alive);
             printArea(area, -1, -1);
             mvprintw(rows + 1, 0,
                      "Generation: %d   Alive: %d   (q - quit, p - pause)",
@@ -54,52 +58,92 @@ int startSimulation(area_t *area,options_t* config) {
         }
     }
     nodelay(stdscr, FALSE);
-    destroyData(&tempArea);
+    destroyArea(&tempArea);
     clear();
-    printw("What can I do for you?\n");
     return 0;
 }
-int countOfAlive(const area_t *area) {
+status_t countOfAlive(const area_t* area, int* alive) {
     int x,y;
-    int alive = 0;
     size_t rows;
     size_t cols;
 
     if (!area)
-        return -1;
+        return STATUS_ERR_NULL_PTR;
+
+    *alive = 0;
 
     rows = area->rows;
     cols = area->cols;
     for (y = 0; y < (int)rows; y++)
         for (x = 0; x < (int)cols; x++)
-            alive += getCell(area,y,x);
-    return alive;
+            *alive += getCell(area,y,x);
+    return STATUS_OK;
 }
-int nextGeneration(area_t *tempArea, area_t *area, options_t* config) {
+status_t nextGeneration(area_t* tempArea, area_t* area, options_t* config) {
     int x, y;
     size_t rows;
     size_t cols;
 
     if (!tempArea || !area || !config)
-        return -1;
+        return STATUS_ERR_NULL_PTR;
     rows = area->rows;
     cols = area->cols;
     for (y = 0; y < (int)rows; y++)
         for (x = 0; x < (int)cols; x++)
-            setCell(tempArea, y, x, checkCell(area, y, x, config));
+            newCellStatus(area, tempArea, y, x, config);
+            //setCell(tempArea, y, x, checkCell(area, y, x, config));
     swap(char*, area->matrix, tempArea->matrix);
-    return 0;
+    return STATUS_OK;
 }
-int checkCell(const area_t *area, int y, int x, options_t* config) {
+// int checkCell(const area_t* area, int y, int x, options_t* config) {
+//     int neighbors = 0;
+//     int dx, dy;
+//     int ny, nx;
+//
+//     size_t rows;
+//     size_t cols;
+//
+//     if (!area)
+//         return -1;
+//
+//     rows = area->rows;
+//     cols = area->cols;
+//
+//     for (dy = -1; dy <= 1; dy++) {
+//         for (dx = -1; dx <= 1; dx++) {
+//             if (dy == 0 && dx == 0)
+//                 continue;
+//             if(config->rule == OUTSIDE_DEAD){
+//                 ny = y + dy;
+//                 nx = x + dx;
+//                 if(ny >= (int)rows || nx >= (int)cols || ny < 0 || nx < 0)
+//                     continue;
+//             }
+//             else{
+//                 ny = y + dy + (int)rows;
+//                 ny %= rows;
+//                 nx = x + dx + (int)cols;
+//                 nx %= cols;
+//             }
+//             neighbors += getCell(area, ny, nx);
+//         }
+//     }
+//     if (getCell(area,y,x))
+//         return (neighbors == 2 || neighbors == 3) ? 1 : 0;
+//     else
+//         return (neighbors == 3) ? 1 : 0;
+// }
+status_t newCellStatus(area_t* area, area_t* tempArea, int y, int x, options_t* config) {
     int neighbors = 0;
     int dx, dy;
     int ny, nx;
+    int cellStatus;
 
     size_t rows;
     size_t cols;
 
     if (!area)
-        return -1;
+        return STATUS_ERR_NULL_PTR;
 
     rows = area->rows;
     cols = area->cols;
@@ -111,7 +155,7 @@ int checkCell(const area_t *area, int y, int x, options_t* config) {
             if(config->rule == OUTSIDE_DEAD){
                 ny = y + dy;
                 nx = x + dx;
-                if(ny >= (int)rows || ny < 0 || nx >= (int)cols || nx < 0)
+                if(ny >= (int)rows || nx >= (int)cols || ny < 0 || nx < 0)
                     continue;
             }
             else{
@@ -120,13 +164,16 @@ int checkCell(const area_t *area, int y, int x, options_t* config) {
                 nx = x + dx + (int)cols;
                 nx %= cols;
             }
-
-            if (getCell(area, ny, nx) == 1)
-                neighbors++;
+            neighbors += getCell(area, ny, nx);
         }
     }
+
     if (getCell(area,y,x))
-        return (neighbors == 2 || neighbors == 3) ? 1 : 0;
+        cellStatus = ((neighbors == 2 || neighbors == 3) ? 1 : 0);
     else
-        return (neighbors == 3) ? 1 : 0;
+        cellStatus = ((neighbors == 3) ? 1 : 0);
+
+    setCell(tempArea, y, x, cellStatus);
+
+    return STATUS_OK;
 }

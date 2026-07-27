@@ -51,7 +51,7 @@ int enterSize(size_t *n) {
     return 0;
 }
 int waitMs(int ms) {
-    if (ms <= 0) return -1;
+    //if (ms <= 0) return -1;
     #ifdef WIN32
         Sleep(ms);
     #else
