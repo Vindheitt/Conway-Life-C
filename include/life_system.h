@@ -11,7 +11,7 @@
 #define FALSE 0
 #define TRUE 1
 
-#define OUTSIDE_LOCKED 0
+#define OUTSIDE_DEAD 0
 #define OUTSIDE_TOROIDAL 1
 
 #define DEFAULT_HEIGHT 20

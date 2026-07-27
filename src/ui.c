@@ -260,7 +260,7 @@ status_t optionsMenu(options_t* config){
         return STATUS_ERR_NULL_PTR;
 
     do{
-        snprintf(ruleInfo, sizeof(ruleInfo), "Change rules (now Outside %s)\n", config->rule == OUTSIDE_LOCKED ? "locked" : "toroidal");
+        snprintf(ruleInfo, sizeof(ruleInfo), "Change rules (now Outside %s)\n", config->rule == OUTSIDE_DEAD ? "dead" : "toroidal");
         snprintf(waitInfo, sizeof(waitInfo), "Change wait time (now %zu ms)\n", config->waitTime);
         snprintf(sizeInfo, sizeof(sizeInfo), "Change size (now %zux%zu)\n", config->rows, config->cols);
 
@@ -301,7 +301,7 @@ status_t changeRulesUI(options_t* config){
     char* title = "Choose type of rule:\n";
 
     char* menuItems[] = {
-        "Outside = locked\n",
+        "Outside = dead\n",
         "Outside = toroidal\n"
     };
     if(!config)
