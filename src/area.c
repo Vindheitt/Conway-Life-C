@@ -12,7 +12,6 @@ status_t destroyArea(area_t **area) {
 status_t createArea(area_t** area, size_t rows, size_t cols) {
     *area = malloc(sizeof(area_t));
     if(!area){
-        //system("echo error_area_create > logs.txt");
         return STATUS_ERR_MEMORY;
     }
     (*area)->rows = rows;
@@ -20,7 +19,6 @@ status_t createArea(area_t** area, size_t rows, size_t cols) {
     (*area)->matrix = calloc(rows * cols, sizeof(char));
     if(!(*area)->matrix){
         free(*area);
-        //system("echo error_matrix_create > logs.txt");
         return STATUS_ERR_MEMORY;
     }
     return STATUS_OK;

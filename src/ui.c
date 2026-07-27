@@ -7,7 +7,7 @@
 #include "utils.h"
 
 
-status_t uiLogic(char* title, char* menuItems[], int menuCount, int *userChoose){
+status_t menuDrawUI(char* title, char* menuItems[], int menuCount, int *userChoose){
     int ch = 0;
     int i;
 
@@ -54,20 +54,20 @@ status_t mainMenu(area_t *area, options_t* config){
 
     clear();
     refresh();
-    uiLogic(title, menuItems, menuCount, &userChoose);
+    menuDrawUI(title, menuItems, menuCount, &userChoose);
 
     clear();
 
     switch (userChoose) {
         case 0:
-            startGame(area,config);
+            startGame(area, config);
             break;
         case 1:
             optionsMenu(config);
             break;
         case 2:
             if(readLifeAreaUI(&area, config) == STATUS_OK)
-                startGame(area,config);
+                startGame(area, config);
             break;
         case 3:
             return STATUS_EXIT;
@@ -237,53 +237,84 @@ status_t readLifeAreaUI(area_t **area, options_t* config){
 
     return STATUS_OK;
 }
-//-----------------------------------------------------
 status_t optionsMenu(options_t* config){
-    int userChoose;
+    int userChoose = 0;
+    int menuCount;
+
+    char ruleInfo[50];
+    char waitInfo[50];
+    char sizeInfo[50];
+
+    char* title = "Options\n";
+
+    char* menuItems[] = {
+        ruleInfo,
+        waitInfo,
+        sizeInfo,
+        "Return"
+    };
+
+    menuCount = sizeof(menuItems) / sizeof(menuItems[0]);
+
     if(!config)
         return STATUS_ERR_NULL_PTR;
-    clear();
-    do{
-        printw("Choose options\n");
-        do{
-            printOptions(config);
-            printw("Enter your choose: ");
-            refresh();
-        }while(enterInt(&userChoose));
 
-        actionOptions(config, userChoose);
-    }while(userChoose);
+    do{
+        snprintf(ruleInfo, sizeof(ruleInfo), "Change rules (now Outside %s)\n", config->rule == OUTSIDE_LOCKED ? "locked" : "toroidal");
+        snprintf(waitInfo, sizeof(waitInfo), "Change wait time (now %zu ms)\n", config->waitTime);
+        snprintf(sizeInfo, sizeof(sizeInfo), "Change size (now %zux%zu)\n", config->rows, config->cols);
+
+        menuDrawUI(title, menuItems, menuCount, &userChoose);
+    }while(changeOptions(config, userChoose) != STATUS_EXIT);
+
     clear();
     return STATUS_OK;
 }
-status_t actionOptions(options_t* config, int userChoose){
+//-----------------------------------------------------
+status_t changeOptions(options_t* config, int userChoose){
     int newValue;
     if(!config)
         return STATUS_ERR_NULL_PTR;
     switch (userChoose) {
+        case 0:
+            changeRulesUI(config);
+            break;
         case 1:
             do{
                 clear();
-                printw("Choose type of rule:\n");
-                printw("\t0)Outside = toroidal\n");
-                printw("\t1)Outside = dead\n");
-                printw("Enter your choose: ");
-            }while(enterInt(&newValue) || (newValue != 1 && newValue !=0));
-            config->rule = newValue;
-            break;
-        case 2:
-            // do{
-            //     clear();
-            //     printw("Enter new value (ms, >=100): ");
-            // }while(enterInt(&newValue) || (newValue < 100));
+                printw("Enter new value (ms, >=100): ");
+            }while(enterInt(&newValue) || (newValue < 100));
             config->waitTime = newValue;
             break;
-        case 3:
-            // chooseSize(config);
-
+        case 2:
+            chooseSize(config);
             break;
+        case 3:
+            return STATUS_EXIT;
     }
+    return STATUS_OK;
+}
+status_t changeRulesUI(options_t* config){
+    int userChoose = 0;
+    int menuCount;
+
+    char* title = "Choose type of rule:\n";
+
+    char* menuItems[] = {
+        "Outside = locked\n",
+        "Outside = toroidal\n"
+    };
+    if(!config)
+        return STATUS_ERR_NULL_PTR;
+
+    menuCount = sizeof(menuItems) / sizeof(menuItems[0]);
+
     clear();
+
+    menuDrawUI(title, menuItems, menuCount, &userChoose);
+
+    config->rule = userChoose;
+
     return STATUS_OK;
 }
 status_t chooseSize(options_t* config){
@@ -320,29 +351,4 @@ status_t chooseSize(options_t* config){
     config->cols = cols;
 
     return STATUS_OK;
-}
-status_t enterNewOptionValue(options_t* config, size_t* value, size_t maxValue){
-    if(!config || !value)
-        return STATUS_ERR_NULL_PTR;
-
-    while(value < 1 || (int)value > maxValue){
-        clear();
-        do{
-            printw("Please enter new value (1..%d): ", maxValue);
-            refresh();
-        }while(enterSize(value));
-        if(value < 1 || (int)value > maxValue){
-
-            printw("Incorrect value. Please try again.\n");
-        }
-    }
-    clear();
-
-    return STATUS_OK;
-}
-void printOptions(options_t* config) {
-    printw("\t1 - Change rules (now %s)\n", (config->rule) ? "locked" : "toroidal");
-    printw("\t2 - Change wait time (now %d)\n", config->waitTime);
-    printw("\t3 - Change area size (now %zux%zu)\n", config->rows, config->cols);
-    printw("\t0 - Return\n");
 }
