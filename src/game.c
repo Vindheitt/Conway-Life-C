@@ -1,4 +1,10 @@
-#include "all_src_files.h"
+#include "life_system.h"
+#include "game.h"
+
+#include "area.h"
+//#include "file_io.h"
+#include "ui.h"
+#include "utils.h"
 
 status_t startGame(area_t* area, options_t* config){
     if(!area)
@@ -26,37 +32,28 @@ status_t startSimulation(area_t* area, options_t* config) {
     rows = area->rows;
     cols = area->cols;
 
-    createArea(&tempArea, rows, cols);
-
-    if (!tempArea)
+    if (createArea(&tempArea, rows, cols) != STATUS_OK)
         return STATUS_ERR_NULL_PTR;
 
+    nodelay(stdscr, TRUE);
     while (TRUE) {
-        printSimulatuon(area, alive, generation, paused);
-
-        nodelay(stdscr, TRUE);
         ch = tolower(getch());
         if (ch == 'q')
             break;
-        else if (ch == 'p')
+        if (ch == 'p')
             paused = !paused;
-
+        if (ch == 's' && paused)
+            saveLifeAreaUI(area);
         if (!paused) {
             nextGeneration(tempArea, area, config);
             generation++;
             countOfAlive(area, &alive);
-
-            waitMs(config->waitTime);
         }
-        else {
-
-            if (ch == 's')
-                saveLifeArea(area);
-        }
+        printSimulatuon(area, alive, generation, paused);
+        waitMs(config->waitTime);
     }
     nodelay(stdscr, FALSE);
     destroyArea(&tempArea);
-    //clear();
     return STATUS_OK;
 }
 status_t countOfAlive(const area_t* area, int* alive) {

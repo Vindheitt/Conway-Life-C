@@ -1,9 +1,9 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-int enterInt(int*);
+status_t enterInt(int*);
 
-int enterSize(size_t* n);
+status_t enterSize(size_t*);
 
 int waitMs(int);
 

@@ -1,4 +1,5 @@
-#include "all_src_files.h"
+#include "life_system.h"
+#include "area.h"
 
 status_t destroyArea(area_t **area) {
     if (!area || !*area)

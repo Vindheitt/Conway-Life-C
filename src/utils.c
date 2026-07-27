@@ -1,57 +1,51 @@
-#include "all_src_files.h"
+#include "life_system.h"
+#include "utils.h"
 
-int enterInt(int *n) {
+status_t enterInt(int *n) {
     char buf[32];
+    int result;
 
     if (!n)
-        return -1;
+        return STATUS_ERR_NULL_PTR;
 
     echo();
     curs_set(1);
-    while (TRUE) {
-        getnstr(buf, sizeof(buf)-1);
-        if (sscanf(buf, "%d", n) == 1)
-            break;
-        clear();
-        printw("Something went wrong with enter int..\n");
-        refresh();
-        clrtoeol();
-        refresh();
-        noecho();
-        curs_set(0);
-        return 1;
-    }
-    curs_set(0);
+
+    getnstr(buf, sizeof(buf) - 1);
+    result = sscanf(buf, "%d", n);
+
     noecho();
-    return 0;
+    curs_set(0);
+    clrtoeol();
+
+    if(result != 1)
+        return STATUS_ERR_INVALID_INPUT;
+    return STATUS_OK;
 }
-int enterSize(size_t *n) {
+status_t enterSize(size_t *n) {
     char buf[32];
+    int result;
 
     if (!n)
-        return -1;
+        return STATUS_ERR_NULL_PTR;
 
     echo();
     curs_set(1);
-    while (TRUE) {
-        getnstr(buf, sizeof(buf)-1);
-        if (sscanf(buf, "%zu", n) == 1)
-            break;
-        clear();
-        printw("Something went wrong with enter int..\n");
-        refresh();
-        clrtoeol();
-        refresh();
-        noecho();
-        curs_set(0);
-        return 1;
-    }
-    curs_set(0);
+
+    getnstr(buf, sizeof(buf) - 1);
+    result = sscanf(buf, "%zu", n);
+
     noecho();
-    return 0;
+    curs_set(0);
+    clrtoeol();
+
+    if(result != 1)
+        return STATUS_ERR_INVALID_INPUT;
+    return STATUS_OK;
 }
 int waitMs(int ms) {
-    //if (ms <= 0) return -1;
+    if (ms <= 0)
+        ms = DEFAULT_WAIT;
     #ifdef WIN32
         Sleep(ms);
     #else

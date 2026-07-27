@@ -11,6 +11,8 @@ status_t moveAndChange(area_t*);
 
 status_t printSimulatuon(const area_t*, int, int, int);
 
+status_t saveLifeAreaUI(const area_t*);
+
 int changeOptions(options_t*);
 
 int actionOptions(options_t*, int);

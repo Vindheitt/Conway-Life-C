@@ -1,4 +1,11 @@
-#include "all_src_files.h"
+#include "life_system.h"
+#include "ui.h"
+
+#include "area.h"
+#include "file_io.h"
+#include "game.h"
+#include "utils.h"
+
 
 status_t uiLogic(char* title, char* menuItems[], int menuCount, int *userChoose){
     int ch = 0;
@@ -92,17 +99,18 @@ status_t printArea(const area_t *area, int curY, int curX) {
 }
 status_t printSimulatuon(const area_t* area, int alive, int generation, int paused){
     size_t rows;
-    size_t cols;
+
+    if(!area)
+        return STATUS_ERR_NULL_PTR;
 
     rows = area->rows;
-    cols = area->cols;
 
     if(!paused){
-    printArea(area, -1, -1);
-    mvprintw(rows + 1, 0,
-             "Generation: %d   Alive: %d   (q - quit, p - pause)",
-             generation, alive);
-    refresh();
+        printArea(area, -1, -1);
+        mvprintw(rows + 1, 0,
+                "Generation: %d   Alive: %d   (q - quit, p - pause)",
+                generation, alive);
+        refresh();
     }
     else{
         mvprintw(LINES-2, 0, ">>> pause (p - continue, s - save) <<<");
@@ -150,7 +158,7 @@ status_t moveAndChange(area_t *area) {
                 setCell(area, curY, curX, !getCell(area, curY, curX));
                 break;
             case 's':
-                saveLifeArea(area);
+                saveLifeAreaUI(area);
                 break;
             case 'q':
                 clear();
@@ -159,6 +167,45 @@ status_t moveAndChange(area_t *area) {
                 break;
         }
     }
+    return STATUS_OK;
+}
+status_t saveLifeAreaUI(const area_t* area){
+    char filename[256];
+    int result;
+
+    if (!area) {
+        mvprintw(LINES-2, 0, "ERR. Area is NULL.\n");
+        refresh();
+        return STATUS_ERR_NULL_PTR;
+    }
+    nodelay(stdscr, FALSE);
+    echo();
+    curs_set(1);
+
+    move(LINES-2, 0);
+    clrtoeol();
+
+    mvprintw(LINES-2, 0, "Enter filename to save: ");
+    refresh();
+    getnstr(filename, sizeof(filename)-1);
+
+    move(LINES-2, 0);
+    clrtoeol();
+
+    result = saveLifeArea(area, filename);
+
+    switch(result){
+        case(STATUS_OK):
+            printw("Data successfully saved to '%s'\n", filename);
+            break;
+        case(STATUS_ERR_FILE_OPEN):
+            printw("Error opening file '%s' for writing..\n", filename);
+            break;
+    }
+    refresh();
+    noecho();
+    curs_set(0);
+    waitMs(SAVE_WAIT);
     return STATUS_OK;
 }
 //-----------------------------------------------------

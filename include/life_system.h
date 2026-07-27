@@ -5,14 +5,6 @@
 #include <stdio.h>
 #include <ctype.h>
 
-// #ifdef _WIN32
-//     #include <curses.h>
-//     #include <windows.h>
-// #else
-//     #include <ncurses.h>
-//     #include <unistd.h>
-// #endif
-
 #include <ncurses.h>
 #include <unistd.h>
 
@@ -30,8 +22,7 @@
 
 #define ENTER 10
 
-//#define swap(t, x, y) do{t temp = x; x = y; y = temp;} while(0)
-#define swap(t, x, y) {t temp = x; x = y; y = temp;}
+#define swap(t, x, y) do{t temp = x; x = y; y = temp;} while(0)
 
 typedef enum{
     STATUS_OK = 0,
@@ -42,16 +33,6 @@ typedef enum{
     STATUS_ERR_FILE_FORMAT,
     STATUS_ERR_INVALID_INPUT
 }status_t;
-/*
-typedef enum{
-    OK = 0,
-    EXIT,
-    ERR_NULL_PTR,
-    ERR_MEMORY,
-    ERR_FILE_OPEN,
-    ERR_FILE_FORMAT,
-    ERR_INVALID_INPUT
-}status_t;*/
 
 typedef struct Area{
     size_t cols;
@@ -62,7 +43,7 @@ typedef struct Area{
 
 typedef struct Options{
     int rule;
-    /*int neighbors;*/
+    //int neighbors;
     int waitTime;
 
     size_t cols;

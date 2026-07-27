@@ -1,4 +1,8 @@
-#include "all_src_files.h"
+#include "life_system.h"
+#include "file_io.h"
+
+#include "area.h"
+#include "utils.h"
 
 status_t readLifeArea(area_t **area, options_t* config){
     char filename[256];
@@ -67,41 +71,22 @@ status_t readLifeArea(area_t **area, options_t* config){
 
     return STATUS_OK;
 }
-status_t saveLifeArea(const area_t *area) {
-    char filename[256];
+status_t saveLifeArea(const area_t* area, char* filename) {
     size_t y,x;
     size_t rows;
     size_t cols;
+
     FILE *file;
 
-    if (!area) {
-        mvprintw(LINES-2, 0, "Err. Area is NULL.\n");
-        refresh();
+    if (!area || !filename)
         return STATUS_ERR_NULL_PTR;
-    }
+
     rows = area->rows;
     cols = area->cols;
 
-    nodelay(stdscr, FALSE);
-    echo();
-    curs_set(1);
-
-    move(LINES-2, 0);
-    clrtoeol();
-
-    mvprintw(LINES-2, 0, "Enter filename to save: ");
-    refresh();
-    getnstr(filename, sizeof(filename)-1);
-
-    move(LINES-2, 0);
-    clrtoeol();
-
     file = fopen(filename, "w");
-    if (!file) {
-        printw("Error opening file '%s' for writing..\n", filename);
-        refresh();
+    if (!file)
         return STATUS_ERR_FILE_OPEN;
-    }
 
     fprintf(file, "%zu %zu\n", rows, cols);
 
@@ -112,11 +97,5 @@ status_t saveLifeArea(const area_t *area) {
     }
 
     fclose(file);
-    printw("Data successfully saved to '%s'\n", filename);
-    refresh();
-
-    noecho();
-    curs_set(0);
-    waitMs(SAVE_WAIT);
     return STATUS_OK;
 }
