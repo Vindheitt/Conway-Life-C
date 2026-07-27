@@ -66,7 +66,7 @@ status_t mainMenu(area_t *area, options_t* config){
             changeOptions(config);
             break;
         case 2:
-            if(readLifeArea(&area, config) == STATUS_OK)
+            if(readLifeAreaUI(&area, config) == STATUS_OK)
                 startGame(area,config);
             break;
         case 3:
@@ -206,6 +206,35 @@ status_t saveLifeAreaUI(const area_t* area){
     noecho();
     curs_set(0);
     waitMs(SAVE_WAIT);
+    return STATUS_OK;
+}
+status_t readLifeAreaUI(area_t **area, options_t* config){
+    char filename[256];
+    int result;
+
+    clear();
+    printw("Enter filename to read: ");
+    refresh();
+
+    echo();
+    curs_set(1);
+    getnstr(filename, sizeof(filename) - 1);
+
+    result = readLifeArea(area, config, filename);
+
+    switch(result){
+        case(STATUS_ERR_FILE_OPEN):
+            printw("Cannot open file '%s'\n", filename);
+            break;
+        case(STATUS_ERR_FILE_FORMAT):
+            printw("Invalid file format: cannot read dimensions.\n");
+            break;
+    }
+
+    refresh();
+    noecho();
+    curs_set(0);
+
     return STATUS_OK;
 }
 //-----------------------------------------------------

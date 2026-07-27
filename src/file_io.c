@@ -4,37 +4,24 @@
 #include "area.h"
 #include "utils.h"
 
-status_t readLifeArea(area_t **area, options_t* config){
-    char filename[256];
+status_t readLifeArea(area_t **area, options_t* config, char* filename){
     size_t rows, cols;
     size_t y, x;
+
     int c;
+
     FILE *file;
 
-    area_t* newArea = NULL;
+    area_t* newArea;
 
-    clear();
-    printw("Enter filename to read: ");
-    refresh();
-
-    echo();
-    curs_set(1);
-    getnstr(filename, sizeof(filename) - 1);
+    if(!area || !config)
+        return STATUS_ERR_NULL_PTR;
 
     file = fopen(filename, "r");
-    if (!file) {
-        printw("Cannot open file '%s'\n", filename);
-        refresh();
-        noecho();
-        curs_set(0);
+    if (!file)
         return STATUS_ERR_FILE_OPEN;
-    }
 
     if (fscanf(file, "%zu %zu", &rows, &cols) != 2) {
-        printw("Invalid file format: cannot read dimensions.\n");
-        refresh();
-        noecho();
-        curs_set(0);
         fclose(file);
         return STATUS_ERR_FILE_FORMAT;
     }
@@ -44,8 +31,6 @@ status_t readLifeArea(area_t **area, options_t* config){
 
     createArea(&newArea, rows, cols);
     if (!newArea) {
-        noecho();
-        curs_set(0);
         fclose(file);
         return STATUS_ERR_NULL_PTR;
     }
@@ -62,11 +47,8 @@ status_t readLifeArea(area_t **area, options_t* config){
             }
         }
     }
-    noecho();
-    curs_set(0);
 
     fclose(file);
-    refresh();
     *area = newArea;
 
     return STATUS_OK;
@@ -81,12 +63,12 @@ status_t saveLifeArea(const area_t* area, char* filename) {
     if (!area || !filename)
         return STATUS_ERR_NULL_PTR;
 
-    rows = area->rows;
-    cols = area->cols;
-
     file = fopen(filename, "w");
     if (!file)
         return STATUS_ERR_FILE_OPEN;
+
+    rows = area->rows;
+    cols = area->cols;
 
     fprintf(file, "%zu %zu\n", rows, cols);
 

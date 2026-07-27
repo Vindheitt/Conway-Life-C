@@ -13,6 +13,8 @@ status_t printSimulatuon(const area_t*, int, int, int);
 
 status_t saveLifeAreaUI(const area_t*);
 
+status_t readLifeAreaUI(area_t**, options_t*);
+
 int changeOptions(options_t*);
 
 int actionOptions(options_t*, int);
