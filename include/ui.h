@@ -15,11 +15,11 @@ status_t saveLifeAreaUI(const area_t*);
 
 status_t readLifeAreaUI(area_t**, options_t*);
 
-int changeOptions(options_t*);
+status_t optionsMenu(options_t*);
 
-int actionOptions(options_t*, int);
+status_t actionOptions(options_t*, int);
 
-int chooseSize(options_t*);
+status_t chooseSize(options_t*);
 
 void printOptions(options_t*);
 

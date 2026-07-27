@@ -1,8 +1,5 @@
 #include "life_system.h"
 #include "area.h"
-// #include "game.h"
-// #include "file_io.h"
-// #include "utils.h"
 #include "ui.h"
 
 status_t makeOptions(options_t**);

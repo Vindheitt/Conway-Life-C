@@ -8,11 +8,11 @@
 #include <ncurses.h>
 #include <unistd.h>
 
-#define TRUE 1
 #define FALSE 0
+#define TRUE 1
 
-#define OUTSIDE_DEAD 1
 #define OUTSIDE_TOROIDAL 0
+#define OUTSIDE_LOCKED 1
 
 #define DEFAULT_HEIGHT 20
 #define DEFAULT_WIDTH  40
@@ -44,7 +44,7 @@ typedef struct Area{
 typedef struct Options{
     int rule;
     //int neighbors;
-    int waitTime;
+    size_t waitTime;
 
     size_t cols;
     size_t rows;

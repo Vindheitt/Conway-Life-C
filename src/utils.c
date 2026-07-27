@@ -43,13 +43,13 @@ status_t enterSize(size_t *n) {
         return STATUS_ERR_INVALID_INPUT;
     return STATUS_OK;
 }
-int waitMs(int ms) {
+status_t waitMs(size_t ms) {
     if (ms <= 0)
         ms = DEFAULT_WAIT;
-    #ifdef WIN32
-        Sleep(ms);
-    #else
+    // #ifdef WIN32
+    //     Sleep(ms);
+    // #else
         usleep(ms * 1000);
-    #endif
-    return 0;
+    //#endif
+    return STATUS_OK;
 }

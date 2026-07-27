@@ -63,7 +63,7 @@ status_t mainMenu(area_t *area, options_t* config){
             startGame(area,config);
             break;
         case 1:
-            changeOptions(config);
+            optionsMenu(config);
             break;
         case 2:
             if(readLifeAreaUI(&area, config) == STATUS_OK)
@@ -238,10 +238,10 @@ status_t readLifeAreaUI(area_t **area, options_t* config){
     return STATUS_OK;
 }
 //-----------------------------------------------------
-int changeOptions(options_t* config){
+status_t optionsMenu(options_t* config){
     int userChoose;
     if(!config)
-        return -1;
+        return STATUS_ERR_NULL_PTR;
     clear();
     do{
         printw("Choose options\n");
@@ -254,13 +254,12 @@ int changeOptions(options_t* config){
         actionOptions(config, userChoose);
     }while(userChoose);
     clear();
-    printw("What can I do for you?\n");
-    return 0;
+    return STATUS_OK;
 }
-int actionOptions(options_t* config, int userChoose){
+status_t actionOptions(options_t* config, int userChoose){
     int newValue;
     if(!config)
-        return -1;
+        return STATUS_ERR_NULL_PTR;
     switch (userChoose) {
         case 1:
             do{
@@ -273,32 +272,26 @@ int actionOptions(options_t* config, int userChoose){
             config->rule = newValue;
             break;
         case 2:
-            do{
-                clear();
-                printw("Enter new value (ms, >=100): ");
-            }while(enterInt(&newValue) || (newValue < 100));
+            // do{
+            //     clear();
+            //     printw("Enter new value (ms, >=100): ");
+            // }while(enterInt(&newValue) || (newValue < 100));
             config->waitTime = newValue;
-
             break;
         case 3:
-            chooseSize(config);
-            break;
-        case 0:
+            // chooseSize(config);
 
-            break;
-        default:
-            //defaultChoose();
             break;
     }
     clear();
-    return 0;
+    return STATUS_OK;
 }
-int chooseSize(options_t* config){
+status_t chooseSize(options_t* config){
     size_t rows = 0;
     size_t cols = 0;
 
     if(!config)
-        return -1;
+        return STATUS_ERR_NULL_PTR;
 
     clear();
     while(rows < 1 || (int)rows > LINES - 2){
@@ -326,11 +319,30 @@ int chooseSize(options_t* config){
     config->rows = rows;
     config->cols = cols;
 
-    return 0;
+    return STATUS_OK;
+}
+status_t enterNewOptionValue(options_t* config, size_t* value, size_t maxValue){
+    if(!config || !value)
+        return STATUS_ERR_NULL_PTR;
+
+    while(value < 1 || (int)value > maxValue){
+        clear();
+        do{
+            printw("Please enter new value (1..%d): ", maxValue);
+            refresh();
+        }while(enterSize(value));
+        if(value < 1 || (int)value > maxValue){
+
+            printw("Incorrect value. Please try again.\n");
+        }
+    }
+    clear();
+
+    return STATUS_OK;
 }
 void printOptions(options_t* config) {
-    printw("\t1 - Change rules (now Outside %s)\n", (config->rule) ? "dead" : "toroidal");
+    printw("\t1 - Change rules (now %s)\n", (config->rule) ? "locked" : "toroidal");
     printw("\t2 - Change wait time (now %d)\n", config->waitTime);
-    printw("\t3 - Change size (now %zux%zu)\n", config->rows, config->cols);
+    printw("\t3 - Change area size (now %zux%zu)\n", config->rows, config->cols);
     printw("\t0 - Return\n");
 }

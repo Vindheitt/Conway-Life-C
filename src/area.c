@@ -25,9 +25,9 @@ status_t createArea(area_t** area, size_t rows, size_t cols) {
     }
     return STATUS_OK;
 }
-char getCell(const area_t *area, int y, int x) {
-    return area->matrix[y * area->cols + x];
-}
 void setCell(area_t *area, int y, int x, char val) {
     area->matrix[y * area->cols + x] = val;
+}
+char getCell(const area_t *area, int y, int x) {
+    return area->matrix[y * area->cols + x];
 }

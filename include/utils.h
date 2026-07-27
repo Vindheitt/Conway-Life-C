@@ -5,6 +5,6 @@ status_t enterInt(int*);
 
 status_t enterSize(size_t*);
 
-int waitMs(int);
+status_t waitMs(size_t);
 
 #endif

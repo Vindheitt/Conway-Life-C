@@ -2,7 +2,6 @@
 #include "game.h"
 
 #include "area.h"
-//#include "file_io.h"
 #include "ui.h"
 #include "utils.h"
 
