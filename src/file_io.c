@@ -4,7 +4,7 @@
 #include "area.h"
 #include "utils.h"
 
-status_t readLifeArea(area_t **area, options_t* config, char* filename){
+status_t readLifeArea(area_t** area, options_t* config, char* filename){
     size_t rows, cols;
     size_t y, x;
 

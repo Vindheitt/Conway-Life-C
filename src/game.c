@@ -14,10 +14,10 @@ status_t startGame(area_t** area, options_t* config){
         return STATUS_ERR_NULL_PTR;
 
     if(moveAndChange(area) == STATUS_OK)
-        startSimulation(*area, config);
+        startSimulation(area, config);
     return STATUS_OK;
 }
-status_t startSimulation(area_t* area, options_t* config) {
+status_t startSimulation(area_t** area, options_t* config) {
     int paused = 0;
     int generation = 0;
     int alive;
@@ -28,11 +28,11 @@ status_t startSimulation(area_t* area, options_t* config) {
 
     area_t *tempArea;
 
-    if (!area)
+    if (!area || !(*area))
         return STATUS_ERR_NULL_PTR;
 
-    rows = area->rows;
-    cols = area->cols;
+    rows = (*area)->rows;
+    cols = (*area)->cols;
 
     if (createArea(&tempArea, rows, cols) != STATUS_OK)
         return STATUS_ERR_NULL_PTR;
@@ -45,13 +45,13 @@ status_t startSimulation(area_t* area, options_t* config) {
         if (ch == 'p')
             paused = !paused;
         if (ch == 's' && paused)
-            saveLifeAreaUI(area);
+            saveLifeAreaUI((*area));
         if (!paused) {
-            nextGeneration(tempArea, area, config);
+            nextGeneration(tempArea, (*area), config);
             generation++;
-            countOfAlive(area, &alive);
+            countOfAlive((*area), &alive);
         }
-        printSimulation(area, alive, generation, paused);
+        printSimulation((*area), alive, generation, paused);
         waitMs(config->waitTime);
     }
     nodelay(stdscr, FALSE);

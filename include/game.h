@@ -3,7 +3,7 @@
 
 status_t startGame(area_t**,options_t*);
 
-status_t startSimulation(area_t*,options_t*);
+status_t startSimulation(area_t**,options_t*);
 
 status_t countOfAlive(const area_t*, int*);
 

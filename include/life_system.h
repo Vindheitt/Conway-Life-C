@@ -4,7 +4,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
+
 #include <limits.h>
+#include <dirent.h>
+#include <string.h>
+
 
 #include <ncurses.h>
 #include <unistd.h>
@@ -22,6 +26,7 @@
 #define SAVE_WAIT 2000
 
 #define BUFFER_SIZE 32
+#define MAX_FILES 256
 
 #define ENTER 10
 
@@ -47,8 +52,7 @@ typedef struct Area{
 
 typedef struct Options{
     int rule;
-    //int neighbors;
-    //int waitTime;
+
     size_t waitTime;
     size_t cols;
     size_t rows;

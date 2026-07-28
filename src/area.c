@@ -2,7 +2,7 @@
 #include "area.h"
 
 status_t destroyArea(area_t **area) {
-    if (!area || !*area)
+    if (!area || !(*area))
         return STATUS_ERR_NULL_PTR;
     free((*area)->matrix);
     free(*area);
@@ -11,7 +11,7 @@ status_t destroyArea(area_t **area) {
 }
 status_t createArea(area_t** area, size_t rows, size_t cols) {
     *area = malloc(sizeof(area_t));
-    if(!area){
+    if(!(*area)){
         return STATUS_ERR_MEMORY;
     }
     (*area)->rows = rows;

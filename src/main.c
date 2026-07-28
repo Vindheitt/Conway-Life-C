@@ -5,8 +5,8 @@
 status_t makeOptions(options_t**);
 
 int main(void){
-    options_t *config;
-    area_t *area;
+    options_t *config = NULL;
+    area_t *area = NULL;
 
     initscr();
     raw();

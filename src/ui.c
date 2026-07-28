@@ -15,14 +15,15 @@ status_t menuDrawUI(char* title, char* menuItems[], int menuCount, int *userChoo
         return STATUS_ERR_NULL_PTR;
 
     while(ch != ENTER){
-        printw("%s", title);
+        printw("%s\n", title);
         for(i = 0; i < menuCount; i++){
             printw("\t");
             if(i == *userChoose)
                 attron(A_REVERSE);
-            printw("%s", menuItems[i]);
+            printw("%s\n", menuItems[i]);
             if(i == *userChoose)
                 attroff(A_REVERSE);
+            //printw("\n");
         }
         refresh();
         ch = tolower(getch());
@@ -39,12 +40,13 @@ status_t menuDrawUI(char* title, char* menuItems[], int menuCount, int *userChoo
     return STATUS_OK;
 }
 status_t mainMenu(area_t** area, options_t* config){
-    char* title = "Conway's game Life\n";
+    char* title = "Conway's game Life";
     char* menuItems[] = {
-        "Start\n",
-        "Options\n",
-        "Read from file\n",
-        "Exit\n",
+        "New game",
+        "Continue",
+        "Options",
+        "Read from file",
+        "Exit",
     };
     int menuCount = sizeof(menuItems) / sizeof(menuItems[0]);
     int userChoose = 0;
@@ -60,16 +62,20 @@ status_t mainMenu(area_t** area, options_t* config){
 
     switch (userChoose) {
         case 0:
+            createArea(area, config->rows, config->cols);
             startGame(area, config);
             break;
         case 1:
-            optionsMenu(config);
+            startGame(area, config);
             break;
         case 2:
+            optionsMenu(config);
+            break;
+        case 3:
             if(readLifeAreaUI(area, config) == STATUS_OK)
                 startGame(area, config);
             break;
-        case 3:
+        case 4:
             return STATUS_EXIT;
     }
     return STATUS_OK;
@@ -206,35 +212,6 @@ status_t saveLifeAreaUI(const area_t* area){
     waitMs(SAVE_WAIT);
     return STATUS_OK;
 }
-status_t readLifeAreaUI(area_t **area, options_t* config){
-    char filename[256];
-    int result;
-
-    clear();
-    printw("Enter filename to read: ");
-    refresh();
-
-    echo();
-    curs_set(1);
-    getnstr(filename, sizeof(filename) - 1);
-
-    result = readLifeArea(area, config, filename);
-
-    switch(result){
-        case(STATUS_ERR_FILE_OPEN):
-            printw("Cannot open file '%s'\n", filename);
-            break;
-        case(STATUS_ERR_FILE_FORMAT):
-            printw("Invalid file format: cannot read dimensions.\n");
-            break;
-    }
-
-    refresh();
-    noecho();
-    curs_set(0);
-
-    return STATUS_OK;
-}
 status_t optionsMenu(options_t* config){
     int userChoose = 0;
     int menuCount;
@@ -243,7 +220,7 @@ status_t optionsMenu(options_t* config){
     char waitInfo[50];
     char sizeInfo[50];
 
-    char* title = "Options\n";
+    char* title = "Options";
 
     char* menuItems[] = {
         ruleInfo,
@@ -258,9 +235,9 @@ status_t optionsMenu(options_t* config){
     menuCount = sizeof(menuItems) / sizeof(menuItems[0]);
 
     do{
-        snprintf(ruleInfo, sizeof(ruleInfo), "Change rules (now Outside %s)\n", config->rule == OUTSIDE_DEAD ? "dead" : "toroidal");
-        snprintf(waitInfo, sizeof(waitInfo), "Change wait time (now %zu ms)\n", config->waitTime);
-        snprintf(sizeInfo, sizeof(sizeInfo), "Change size (now %zux%zu)\n", config->rows, config->cols);
+        snprintf(ruleInfo, sizeof(ruleInfo), "Change rules (now Outside %s)", config->rule == OUTSIDE_DEAD ? "dead" : "toroidal");
+        snprintf(waitInfo, sizeof(waitInfo), "Change wait time (now %zu ms)", config->waitTime);
+        snprintf(sizeInfo, sizeof(sizeInfo), "Change size (now %zux%zu)", config->rows, config->cols);
 
         clear();
         menuDrawUI(title, menuItems, menuCount, &userChoose);
@@ -290,11 +267,11 @@ status_t changeRulesUI(options_t* config){
     int userChoose = 0;
     int menuCount;
 
-    char* title = "Choose type of rule:\n";
+    char* title = "Choose type of rule:";
 
     char* menuItems[] = {
-        "Outside = dead\n",
-        "Outside = toroidal\n"
+        "Outside = dead",
+        "Outside = toroidal"
     };
     if(!config)
         return STATUS_ERR_NULL_PTR;
@@ -371,6 +348,73 @@ status_t changeSizeUI(options_t* config){
     }
     config->rows = rows;
     config->cols = cols;
+
+    return STATUS_OK;
+}
+status_t readLifeAreaUI(area_t** area, options_t* config) {
+    DIR* dir;
+    struct dirent *entry;
+
+    int fileCount = 0;
+    int userChoose = 0;
+    int status;
+    int i;
+
+    char fullPath[512];
+    char* fileList[MAX_FILES];
+    char* title = "Select file to load:";
+
+    dir = opendir("areas");
+    if (!dir) {
+        printw("Error: cannot open areas/ directory.\n");
+        return STATUS_ERR_FILE_OPEN;
+    }
+
+    while ((entry = readdir(dir)) != NULL && fileCount < 255) {
+        if (entry->d_name[0] == '.')
+            continue;
+        fileList[fileCount++] = strdup(entry->d_name);
+    }
+    closedir(dir);
+
+    if (fileCount == 0) {
+        printw("No files found in areas/ directory.\n");
+        return STATUS_ERR_FILE_OPEN;
+    }
+
+    fileList[fileCount] = "Return";
+    fileCount++;
+
+    clear();
+    menuDrawUI(title, fileList, fileCount, &userChoose);
+
+    if (userChoose == fileCount - 1){
+        for (i = 0; i < fileCount - 1; i++)
+            free(fileList[i]);
+        return STATUS_EXIT;
+    }
+
+
+    snprintf(fullPath, sizeof(fullPath), "areas/%s", fileList[userChoose]);
+
+    status = readLifeArea(area, config, fullPath);
+
+    switch(status){
+        case(STATUS_ERR_FILE_OPEN):
+            printw("Cannot open file '%s'\n", fullPath);
+            refresh();
+            waitMs(SAVE_WAIT);
+            break;
+        case(STATUS_ERR_FILE_FORMAT):
+            printw("Invalid file format: cannot read dimensions.\n");
+            refresh();
+            waitMs(SAVE_WAIT);
+            break;
+    }
+
+
+    for (i = 0; i < fileCount - 1; i++)
+        free(fileList[i]);
 
     return STATUS_OK;
 }
