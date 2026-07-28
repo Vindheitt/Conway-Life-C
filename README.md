@@ -24,8 +24,8 @@
   - Размер поля (строки × столбцы) с автоматическим ограничением по терминалу.
 
 - **Загрузка/сохранение файлов**
-  - Save and load field states in a simple text format (dimensions + matrix of `0`/`1`)
-  - Browse and select files from the `areas/` directory via a built-in file picker
+  - Файлы для сохранения и загрузки имеют простой формат (размеры поля + таблица `0`/`1`)
+  - Сохранение и загрузка происходят через директорию `areas/` 
 
 - **Модульный код**
   - Написан в стандарте C90
