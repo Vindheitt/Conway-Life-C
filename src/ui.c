@@ -62,7 +62,7 @@ status_t mainMenu(area_t** area, options_t* config){
 
     switch (userChoose) {
         case 0:
-            destroyData(area);
+            destroyArea(area);
             createArea(area, config->rows, config->cols);
             startGame(area, config);
             break;
@@ -176,6 +176,7 @@ status_t moveAndChange(area_t** area) {
 }
 status_t saveLifeAreaUI(const area_t* area){
     char filename[256];
+    char path[512];
     int result;
 
     if (!area) {
@@ -196,15 +197,15 @@ status_t saveLifeAreaUI(const area_t* area){
 
     move(LINES-2, 0);
     clrtoeol();
-
-    result = saveLifeArea(area, filename);
+    snprintf(path, sizeof(path), "areas/%s", filename);
+    result = saveLifeArea(area, path);
 
     switch(result){
         case(STATUS_OK):
-            printw("Data successfully saved to '%s'\n", filename);
+            printw("Data successfully saved to '%s'\n", path);
             break;
         case(STATUS_ERR_FILE_OPEN):
-            printw("Error opening file '%s' for writing..\n", filename);
+            printw("Error opening file '%s' for writing..\n", path);
             break;
     }
     refresh();
