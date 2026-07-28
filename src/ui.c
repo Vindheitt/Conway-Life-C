@@ -189,7 +189,8 @@ status_t moveAndChange(area_t** area) {
 status_t saveLifeAreaUI(const area_t* area){
     char filename[MAX_FILES];
     char path[MAX_PATH];
-    int result;
+
+    status_t status;
 
     if (!area) {
         mvprintw(LINES-2, 0, "ERR. Area is NULL.\n");
@@ -210,9 +211,9 @@ status_t saveLifeAreaUI(const area_t* area){
     move(LINES-2, 0);
     clrtoeol();
     snprintf(path, sizeof(path), "areas/%s", filename);
-    result = saveLifeArea(area, path);
+    status = saveLifeArea(area, path);
 
-    switch(result){
+    switch(status){
         case(STATUS_OK):
             printw("Data successfully saved to '%s'\n", path);
             break;
@@ -224,7 +225,7 @@ status_t saveLifeAreaUI(const area_t* area){
     noecho();
     curs_set(0);
     waitMs(SAVE_WAIT);
-    return STATUS_OK;
+    return status;
 }
 status_t readLifeAreaUI(area_t** area, options_t* config) {
     DIR* dir;
@@ -303,7 +304,7 @@ status_t readLifeAreaUI(area_t** area, options_t* config) {
     for (i = 0; i < fileCount - 1; i++)
         free(fileList[i]);
 
-    return STATUS_OK;
+    return status;
 }
 status_t optionsMenu(options_t* config){
     int userChoose = 0;
@@ -461,7 +462,7 @@ status_t changeSizeUI(options_t* config){
     return STATUS_OK;
 }
 status_t printError(status_t error){
-    if(error == STATUS_OK || error == STATUS_EXIT || STATUS_END_OF_PROGRAMM)
+    if(error == STATUS_OK || error == STATUS_EXIT || error == STATUS_END_OF_PROGRAMM)
         return STATUS_OK;
     move(LINES-2, 0);
     clrtoeol();
