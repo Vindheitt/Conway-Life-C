@@ -15,7 +15,7 @@ int main(void){
     curs_set(0);
 
     CHECK_PRINT(makeOptions(&config));
-    CHECK_PRINT(mainMenu(&area, config));
+    mainMenu(&area, config);
 
     destroyArea(&area);
     free(config);

@@ -6,12 +6,14 @@
 #include "utils.h"
 
 status_t startGame(area_t** area, options_t* config){
+    status_t status;
     if(!area)
         return STATUS_ERR_NULL_PTR;
-    if(!(*area))
-        createArea(area, config->rows, config->cols);
-    if(!(*area))
-        return STATUS_ERR_NULL_PTR;
+    if(!(*area)) {
+        status = createArea(area, config->rows, config->cols);
+        if(status != STATUS_OK)
+            return status;
+    }
 
     if(moveAndChange(area) == STATUS_OK)
         startSimulation(area, config);

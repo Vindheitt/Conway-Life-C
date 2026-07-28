@@ -78,13 +78,11 @@ status_t mainMenu(area_t** area, options_t* config){
                 status = readLifeAreaUI(area, config);
                 if(status == STATUS_OK)
                     startGame(area, config);
-                else
-                    CHECK_PRINT(status);
                 break;
             case 4:
                 status = STATUS_EXIT;
         }
-        printError(status);
+        CHECK_PRINT(status);
     }while(status != STATUS_EXIT);
 
     return STATUS_OK;
@@ -220,6 +218,81 @@ status_t saveLifeAreaUI(const area_t* area){
     noecho();
     curs_set(0);
     waitMs(SAVE_WAIT);
+    return STATUS_OK;
+}
+status_t readLifeAreaUI(area_t** area, options_t* config) {
+    DIR* dir;
+    struct dirent *entry;
+
+    int fileCount = 0;
+    int userChoose = 0;
+    int i;
+
+    status_t status;
+
+    char fullPath[512];
+    char* fileList[MAX_FILES];
+    char* title = "Select file to load:";
+
+    dir = opendir("areas");
+    if (!dir) {
+        printw("Error: cannot open areas/ directory.\n");
+        return STATUS_ERR_FILE_OPEN;
+    }
+
+    while ((entry = readdir(dir)) != NULL && fileCount < 255) {
+        if (entry->d_name[0] == '.')
+            continue;
+        fileList[fileCount++] = strdup(entry->d_name);
+    }
+    closedir(dir);
+
+    if (fileCount == 0) {
+        printw("No files found in areas/ directory.\n");
+        return STATUS_ERR_FILE_OPEN;
+    }
+
+    fileList[fileCount] = "Return";
+    fileCount++;
+
+    clear();
+
+    if (menuDrawUI(title, fileList, fileCount, &userChoose) != STATUS_OK) {
+        for (i = 0; i < fileCount; i++)
+            free(fileList[i]);
+        return STATUS_ERR_UNKNOWN;
+    }
+
+    if (userChoose == fileCount - 1){
+        for (i = 0; i < fileCount - 1; i++)
+            free(fileList[i]);
+        return STATUS_EXIT;
+    }
+
+
+    snprintf(fullPath, sizeof(fullPath), "areas/%s", fileList[userChoose]);
+
+    status = readLifeArea(area, config, fullPath);
+
+    switch(status){
+        case(STATUS_ERR_FILE_OPEN):
+            printw("Cannot open file '%s'\n", fullPath);
+            refresh();
+            waitMs(SAVE_WAIT);
+            break;
+        case(STATUS_ERR_FILE_FORMAT):
+            printw("Invalid file format: cannot read dimensions.\n");
+            refresh();
+            waitMs(SAVE_WAIT);
+            break;
+        default:
+            CHECK_PRINT(status);
+            break;
+    }
+
+    for (i = 0; i < fileCount - 1; i++)
+        free(fileList[i]);
+
     return STATUS_OK;
 }
 status_t optionsMenu(options_t* config){
@@ -361,72 +434,6 @@ status_t changeSizeUI(options_t* config){
     }
     config->rows = rows;
     config->cols = cols;
-
-    return STATUS_OK;
-}
-status_t readLifeAreaUI(area_t** area, options_t* config) {
-    DIR* dir;
-    struct dirent *entry;
-
-    int fileCount = 0;
-    int userChoose = 0;
-    int status;
-    int i;
-
-    char fullPath[512];
-    char* fileList[MAX_FILES];
-    char* title = "Select file to load:";
-
-    dir = opendir("areas");
-    if (!dir) {
-        printw("Error: cannot open areas/ directory.\n");
-        return STATUS_ERR_FILE_OPEN;
-    }
-
-    while ((entry = readdir(dir)) != NULL && fileCount < 255) {
-        if (entry->d_name[0] == '.')
-            continue;
-        fileList[fileCount++] = strdup(entry->d_name);
-    }
-    closedir(dir);
-
-    if (fileCount == 0) {
-        printw("No files found in areas/ directory.\n");
-        return STATUS_ERR_FILE_OPEN;
-    }
-
-    fileList[fileCount] = "Return";
-    fileCount++;
-
-    clear();
-    menuDrawUI(title, fileList, fileCount, &userChoose);
-
-    if (userChoose == fileCount - 1){
-        for (i = 0; i < fileCount - 1; i++)
-            free(fileList[i]);
-        return STATUS_EXIT;
-    }
-
-
-    snprintf(fullPath, sizeof(fullPath), "areas/%s", fileList[userChoose]);
-
-    status = readLifeArea(area, config, fullPath);
-
-    switch(status){
-        case(STATUS_ERR_FILE_OPEN):
-            printw("Cannot open file '%s'\n", fullPath);
-            refresh();
-            waitMs(SAVE_WAIT);
-            break;
-        case(STATUS_ERR_FILE_FORMAT):
-            printw("Invalid file format: cannot read dimensions.\n");
-            refresh();
-            waitMs(SAVE_WAIT);
-            break;
-    }
-
-    for (i = 0; i < fileCount - 1; i++)
-        free(fileList[i]);
 
     return STATUS_OK;
 }
