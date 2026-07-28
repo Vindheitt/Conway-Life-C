@@ -62,9 +62,8 @@ status_t mainMenu(area_t** area, options_t* config){
 
     switch (userChoose) {
         case 0:
-            destroyArea(area);
-            createArea(area, config->rows, config->cols);
-            startGame(area, config);
+            if(createArea(area, config->rows, config->cols) == STATUS_OK)
+                startGame(area, config);
             break;
         case 1:
             startGame(area, config);
