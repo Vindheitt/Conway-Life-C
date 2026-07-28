@@ -64,12 +64,12 @@ status_t mainMenu(area_t** area, options_t* config){
 
         switch (userChoose) {
             case 0:
-                if(area && *area)
+                if (area && *area)
                     destroyArea(area);
-                startGame(area, config);
+                CHECK_PRINT(startGame(area, config));
                 break;
             case 1:
-                startGame(area, config);
+                CHECK_PRINT(startGame(area, config));
                 break;
             case 2:
                 optionsMenu(config);
