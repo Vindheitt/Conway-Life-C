@@ -27,6 +27,7 @@
 
 #define BUFFER_SIZE 32
 #define MAX_FILES 256
+#define MAX_PATH 512
 
 #define ENTER 10
 

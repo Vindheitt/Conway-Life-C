@@ -52,9 +52,9 @@ status_t startSimulation(area_t** area, options_t* config) {
             nextGeneration(tempArea, (*area), config);
             generation++;
             countOfAlive((*area), &alive);
+            waitMs(config->waitTime);
         }
         printSimulation((*area), alive, generation, paused);
-        waitMs(config->waitTime);
     }
     nodelay(stdscr, FALSE);
     destroyArea(&tempArea);

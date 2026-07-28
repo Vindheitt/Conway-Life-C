@@ -181,8 +181,8 @@ status_t moveAndChange(area_t** area) {
     return STATUS_OK;
 }
 status_t saveLifeAreaUI(const area_t* area){
-    char filename[256];
-    char path[512];
+    char filename[MAX_FILES];
+    char path[MAX_PATH];
     int result;
 
     if (!area) {
@@ -230,7 +230,7 @@ status_t readLifeAreaUI(area_t** area, options_t* config) {
 
     status_t status;
 
-    char fullPath[512];
+    char fullPath[MAX_PATH];
     char* fileList[MAX_FILES];
     char* title = "Select file to load:";
 
