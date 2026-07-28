@@ -23,10 +23,8 @@ status_t changeRulesUI(options_t*);
 
 status_t changeWaitTimeUI(options_t*);
 
-status_t changeSizeUI(options_t* config);
+status_t changeSizeUI(options_t*);
 
-status_t chooseSize(options_t*);
-
-status_t enterNewOptionValue(size_t*, size_t, char*);
+status_t printError(status_t);
 
 #endif

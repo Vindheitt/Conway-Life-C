@@ -40,7 +40,8 @@ typedef enum{
     STATUS_ERR_FILE_OPEN,
     STATUS_ERR_FILE_FORMAT,
     STATUS_ERR_INVALID_INPUT,
-    STATUS_ERR_EMPTY_STR
+    STATUS_ERR_EMPTY_STR,
+    STATUS_UNKNOWN_ERR
 }status_t;
 
 typedef struct Area{

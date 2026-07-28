@@ -15,6 +15,7 @@ status_t menuDrawUI(char* title, char* menuItems[], int menuCount, int *userChoo
         return STATUS_ERR_NULL_PTR;
 
     while(ch != ENTER){
+        clear();
         printw("%s\n", title);
         for(i = 0; i < menuCount; i++){
             printw("\t");
@@ -23,7 +24,6 @@ status_t menuDrawUI(char* title, char* menuItems[], int menuCount, int *userChoo
             printw("%s\n", menuItems[i]);
             if(i == *userChoose)
                 attroff(A_REVERSE);
-            //printw("\n");
         }
         refresh();
         ch = tolower(getch());
@@ -35,7 +35,7 @@ status_t menuDrawUI(char* title, char* menuItems[], int menuCount, int *userChoo
                 *userChoose = (*userChoose >= menuCount-1) ? 0 : (*userChoose + 1);
                 break;
         }
-        clear();
+
     }
     return STATUS_OK;
 }
@@ -51,33 +51,39 @@ status_t mainMenu(area_t** area, options_t* config){
     int menuCount = sizeof(menuItems) / sizeof(menuItems[0]);
     int userChoose = 0;
 
+    status_t status;
+
     if(!config)
         return STATUS_ERR_NULL_PTR;
+    do{
+        clear();
+        refresh();
+        menuDrawUI(title, menuItems, menuCount, &userChoose);
 
-    clear();
-    refresh();
-    menuDrawUI(title, menuItems, menuCount, &userChoose);
+        status = STATUS_OK;
 
-    clear();
-
-    switch (userChoose) {
-        case 0:
-            if(createArea(area, config->rows, config->cols) == STATUS_OK)
+        switch (userChoose) {
+            case 0:
+                if(area && *area)
+                    destroyArea(area);
                 startGame(area, config);
-            break;
-        case 1:
-            startGame(area, config);
-            break;
-        case 2:
-            optionsMenu(config);
-            break;
-        case 3:
-            if(readLifeAreaUI(area, config) == STATUS_OK)
+                break;
+            case 1:
                 startGame(area, config);
-            break;
-        case 4:
-            return STATUS_EXIT;
-    }
+                break;
+            case 2:
+                optionsMenu(config);
+                break;
+            case 3:
+                if(readLifeAreaUI(area, config) == STATUS_OK)
+                    startGame(area, config);
+                break;
+            case 4:
+                status = STATUS_EXIT;
+        }
+        printError(status);
+    }while(status != STATUS_EXIT);
+
     return STATUS_OK;
 }
 status_t printArea(const area_t *area, int curY, int curX) {
@@ -416,5 +422,28 @@ status_t readLifeAreaUI(area_t** area, options_t* config) {
     for (i = 0; i < fileCount - 1; i++)
         free(fileList[i]);
 
+    return STATUS_OK;
+}
+status_t printError(status_t error){
+    static const char* errName[] = {
+        "STATUS_OK",
+        "STATUS_EXIT",
+        "STATUS_ERR_NULL_PTR",
+        "STATUS_ERR_MEMORY",
+        "STATUS_ERR_FILE_OPEN",
+        "STATUS_ERR_FILE_FORMAT",
+        "STATUS_ERR_INVALID_INPUT",
+        "STATUS_ERR_EMPTY_STR"
+    };
+
+    if(error == STATUS_OK || error == STATUS_EXIT)
+        return STATUS_OK;
+    if (error < 0 || error >= sizeof(errName)/sizeof(errName[0]))
+        return STATUS_UNKNOWN_ERR;
+    move(LINES-2, 0);
+    clrtoeol();
+    mvprintw(LINES-2, 0, "%s", errName[error]);
+    refresh();
+    getch();
     return STATUS_OK;
 }
