@@ -1,16 +1,12 @@
 #ifndef AREA_H
 #define AREA_H
 
-int moveAndChange(area_t*);
+status_t destroyArea(area_t**);
 
-void destroyData(area_t**);
-
-void endOfProgramm(void);
+status_t createArea(area_t**, size_t, size_t);
 
 void setCell(area_t*, int, int, char);
 
 char getCell(const area_t*, int, int);
-
-area_t* createArea(size_t, size_t);
 
 #endif
