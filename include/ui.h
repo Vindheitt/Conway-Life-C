@@ -27,4 +27,6 @@ status_t changeSizeUI(options_t*);
 
 status_t printError(status_t);
 
+const char* statusToString(status_t);
+
 #endif

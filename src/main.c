@@ -14,8 +14,8 @@ int main(void){
     keypad(stdscr, TRUE);
     curs_set(0);
 
-    makeOptions(&config);
-    mainMenu(&area, config);
+    CHECK_PRINT(makeOptions(&config));
+    CHECK_PRINT(mainMenu(&area, config));
 
     destroyArea(&area);
     free(config);

@@ -75,8 +75,11 @@ status_t mainMenu(area_t** area, options_t* config){
                 optionsMenu(config);
                 break;
             case 3:
-                if(readLifeAreaUI(area, config) == STATUS_OK)
+                status = readLifeAreaUI(area, config);
+                if(status == STATUS_OK)
                     startGame(area, config);
+                else
+                    CHECK_PRINT(status);
                 break;
             case 4:
                 status = STATUS_EXIT;
@@ -295,15 +298,18 @@ status_t changeRulesUI(options_t* config){
 }
 status_t changeWaitTimeUI(options_t* config){
     size_t waitTime;
+    status_t result;
 
-    clear();
     while(TRUE){
-        do{
-            printw("Enter new wait-time (ms, >= 10): ");
-            refresh();
-        }while(enterSize(&waitTime));
+        printw("Enter new wait-time (ms, >= 10): ");
+        refresh();
+        result = enterSize(&waitTime);
         clear();
-        if(waitTime < 10)
+
+        if(result == STATUS_ERR_INVALID_INPUT){
+            printw("Something went wrong with enter number...\n");
+        }
+        else if(waitTime < 10)
             printw("Incorrect value. Please try again.\n");
         else
             break;
@@ -317,7 +323,7 @@ status_t changeSizeUI(options_t* config){
     size_t rows = 0;
     size_t cols = 0;
 
-    int result;
+    status_t result;
 
     if(!config)
         return STATUS_ERR_NULL_PTR;
@@ -425,7 +431,17 @@ status_t readLifeAreaUI(area_t** area, options_t* config) {
     return STATUS_OK;
 }
 status_t printError(status_t error){
-    static const char* errName[] = {
+    if(error == STATUS_OK || error == STATUS_EXIT)
+        return STATUS_OK;
+    move(LINES-2, 0);
+    clrtoeol();
+    mvprintw(LINES-2, 0, "%s", statusToString(error));
+    refresh();
+    getch();
+    return STATUS_OK;
+}
+const char* statusToString(status_t status) {
+    static const char* names[] = {
         "STATUS_OK",
         "STATUS_EXIT",
         "STATUS_ERR_NULL_PTR",
@@ -435,15 +451,7 @@ status_t printError(status_t error){
         "STATUS_ERR_INVALID_INPUT",
         "STATUS_ERR_EMPTY_STR"
     };
-
-    if(error == STATUS_OK || error == STATUS_EXIT)
-        return STATUS_OK;
-    if (error < 0 || error >= sizeof(errName)/sizeof(errName[0]))
-        return STATUS_UNKNOWN_ERR;
-    move(LINES-2, 0);
-    clrtoeol();
-    mvprintw(LINES-2, 0, "%s", errName[error]);
-    refresh();
-    getch();
-    return STATUS_OK;
+    if (status < 0 || status >= sizeof(names)/sizeof(names[0]))
+        return "UNKNOWN";
+    return names[status];
 }

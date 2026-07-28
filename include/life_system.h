@@ -32,6 +32,13 @@
 
 #define swap(t, x, y) do{t temp = x; x = y; y = temp;} while(0)
 
+#define CHECK_PRINT(st) \
+    do { \
+        if ((st) != STATUS_OK && (st) != STATUS_EXIT) { \
+            printError(st); \
+        } \
+    } while(0)
+
 typedef enum{
     STATUS_OK = 0,
     STATUS_EXIT,
