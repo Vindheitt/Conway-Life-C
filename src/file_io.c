@@ -10,6 +10,8 @@ status_t readLifeArea(area_t** area, options_t* config, char* filename){
 
     int c;
 
+    status_t status;
+
     FILE *file;
 
     area_t* newArea;
@@ -29,10 +31,10 @@ status_t readLifeArea(area_t** area, options_t* config, char* filename){
     config->rows = rows;
     config->cols = cols;
 
-    createArea(&newArea, rows, cols);
-    if (!newArea) {
+    status = createArea(&newArea, rows, cols);
+    if (status != STATUS_OK) {
         fclose(file);
-        return STATUS_ERR_NULL_PTR;
+        return STATUS_ERR_UNKNOWN;
     }
 
     x = 0;
@@ -49,6 +51,7 @@ status_t readLifeArea(area_t** area, options_t* config, char* filename){
     }
 
     fclose(file);
+    destroyArea(area);
     *area = newArea;
 
     return STATUS_OK;
