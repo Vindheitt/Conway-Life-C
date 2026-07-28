@@ -258,7 +258,7 @@ status_t readLifeAreaUI(area_t** area, options_t* config) {
     clear();
 
     if (menuDrawUI(title, fileList, fileCount, &userChoose) != STATUS_OK) {
-        for (i = 0; i < fileCount; i++)
+        for (i = 0; i < fileCount-1; i++)
             free(fileList[i]);
         return STATUS_ERR_UNKNOWN;
     }
