@@ -34,6 +34,8 @@ status_t menuDrawUI(char* title, char* menuItems[], int menuCount, int *userChoo
             case 'j': case KEY_DOWN:
                 *userChoose = (*userChoose >= menuCount-1) ? 0 : (*userChoose + 1);
                 break;
+            case 'q':
+                return STATUS_EXIT;
         }
 
     }
@@ -58,8 +60,12 @@ status_t mainMenu(area_t** area, options_t* config){
     do{
         clear();
         refresh();
-        menuDrawUI(title, menuItems, menuCount, &userChoose);
+        status = menuDrawUI(title, menuItems, menuCount, &userChoose);
 
+        if(status == STATUS_EXIT)
+            return STATUS_EXIT;
+        else if(status != STATUS_OK)
+            return STATUS_ERR_UNKNOWN;
         status = STATUS_OK;
 
         switch (userChoose) {
@@ -77,13 +83,13 @@ status_t mainMenu(area_t** area, options_t* config){
             case 3:
                 status = readLifeAreaUI(area, config);
                 if(status == STATUS_OK)
-                    startGame(area, config);
+                    status = startGame(area, config);
                 break;
             case 4:
-                status = STATUS_EXIT;
+                status = STATUS_END_OF_PROGRAMM;
         }
         CHECK_PRINT(status);
-    }while(status != STATUS_EXIT);
+    }while(status != STATUS_END_OF_PROGRAMM);
 
     return STATUS_OK;
 }
@@ -256,11 +262,15 @@ status_t readLifeAreaUI(area_t** area, options_t* config) {
     fileCount++;
 
     clear();
+    status = menuDrawUI(title, fileList, fileCount, &userChoose);
 
-    if (menuDrawUI(title, fileList, fileCount, &userChoose) != STATUS_OK) {
+    if(status == STATUS_EXIT || status != STATUS_OK){
         for (i = 0; i < fileCount-1; i++)
             free(fileList[i]);
+        if(status == STATUS_EXIT)
+            return STATUS_EXIT;
         return STATUS_ERR_UNKNOWN;
+
     }
 
     if (userChoose == fileCount - 1){
@@ -312,6 +322,8 @@ status_t optionsMenu(options_t* config){
         "Return"
     };
 
+    status_t status;
+
     if(!config)
         return STATUS_ERR_NULL_PTR;
 
@@ -323,7 +335,11 @@ status_t optionsMenu(options_t* config){
         snprintf(sizeInfo, sizeof(sizeInfo), "Change size (now %zux%zu)", config->rows, config->cols);
 
         clear();
-        menuDrawUI(title, menuItems, menuCount, &userChoose);
+        status = menuDrawUI(title, menuItems, menuCount, &userChoose);
+        if(status == STATUS_EXIT)
+            return STATUS_EXIT;
+        else if(status != STATUS_OK)
+            return STATUS_ERR_UNKNOWN;
     }while(changeOptions(config, userChoose) != STATUS_EXIT);
 
     return STATUS_OK;
@@ -350,6 +366,8 @@ status_t changeRulesUI(options_t* config){
     int userChoose = 0;
     int menuCount;
 
+    status_t status;
+
     char* title = "Choose type of rule:";
 
     char* menuItems[] = {
@@ -363,7 +381,12 @@ status_t changeRulesUI(options_t* config){
 
     clear();
 
-    menuDrawUI(title, menuItems, menuCount, &userChoose);
+    status = menuDrawUI(title, menuItems, menuCount, &userChoose);
+
+    if(status == STATUS_EXIT)
+        return STATUS_EXIT;
+    else if(status != STATUS_OK)
+        return STATUS_ERR_UNKNOWN;
 
     config->rule = userChoose;
 
@@ -438,7 +461,7 @@ status_t changeSizeUI(options_t* config){
     return STATUS_OK;
 }
 status_t printError(status_t error){
-    if(error == STATUS_OK || error == STATUS_EXIT)
+    if(error == STATUS_OK || error == STATUS_EXIT || STATUS_END_OF_PROGRAMM)
         return STATUS_OK;
     move(LINES-2, 0);
     clrtoeol();
@@ -451,6 +474,7 @@ const char* statusToString(status_t status) {
     static const char* names[] = {
         "STATUS_OK",
         "STATUS_EXIT",
+        "STATUS_END_OF_PROGRAMM",
         "STATUS_ERR_NULL_PTR",
         "STATUS_ERR_MEMORY",
         "STATUS_ERR_FILE_OPEN",

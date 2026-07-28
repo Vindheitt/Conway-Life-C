@@ -22,7 +22,7 @@ status_t startGame(area_t** area, options_t* config){
 status_t startSimulation(area_t** area, options_t* config) {
     int paused = 0;
     int generation = 0;
-    int alive;
+    int alive = 0;
     int ch;
 
     size_t rows;

@@ -35,7 +35,7 @@
 
 #define CHECK_PRINT(st) \
     do { \
-        if ((st) != STATUS_OK && (st) != STATUS_EXIT) { \
+        if ((st) != STATUS_OK && (st) != STATUS_EXIT && (st) != STATUS_END_OF_PROGRAMM) { \
             printError(st); \
         } \
     } while(0)
@@ -43,6 +43,7 @@
 typedef enum{
     STATUS_OK = 0,
     STATUS_EXIT,
+    STATUS_END_OF_PROGRAMM,
     STATUS_ERR_NULL_PTR,
     STATUS_ERR_MEMORY,
     STATUS_ERR_FILE_OPEN,
