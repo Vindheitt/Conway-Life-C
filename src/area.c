@@ -10,6 +10,8 @@ status_t destroyArea(area_t **area) {
     return STATUS_OK;
 }
 status_t createArea(area_t** area, size_t rows, size_t cols) {
+    if (!area)
+        return STATUS_ERR_NULL_PTR;
     *area = malloc(sizeof(area_t));
     if(!(*area))
         return STATUS_ERR_MEMORY;
