@@ -66,13 +66,13 @@ status_t mainMenu(area_t** area, options_t* config){
             case 0:
                 if (area && *area)
                     destroyArea(area);
-                CHECK_PRINT(startGame(area, config));
+                status = startGame(area, config);
                 break;
             case 1:
-                CHECK_PRINT(startGame(area, config));
+                status = startGame(area, config);
                 break;
             case 2:
-                optionsMenu(config);
+                status = optionsMenu(config);
                 break;
             case 3:
                 status = readLifeAreaUI(area, config);
