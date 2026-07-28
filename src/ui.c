@@ -62,6 +62,7 @@ status_t mainMenu(area_t** area, options_t* config){
 
     switch (userChoose) {
         case 0:
+            destroyData(area);
             createArea(area, config->rows, config->cols);
             startGame(area, config);
             break;
@@ -411,7 +412,6 @@ status_t readLifeAreaUI(area_t** area, options_t* config) {
             waitMs(SAVE_WAIT);
             break;
     }
-
 
     for (i = 0; i < fileCount - 1; i++)
         free(fileList[i]);
